@@ -1,0 +1,118 @@
+https://react-demo.tailadmin.com/task-list
+
+==================== Users table ==================
+
+CREATE TABLE IF NOT EXISTS public.users (
+    user_id BIGSERIAL PRIMARY KEY,
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_users_role
+        CHECK (role IN ('ADMIN', 'USER'))
+);
+
+
+
+==================== Task table ==================
+
+CREATE TABLE IF NOT EXISTS public.tasks (
+    task_id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    description TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'TODO',
+    priority VARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    due_date DATE,
+    assigned_to BIGINT
+        REFERENCES public.users(user_id)
+        ON DELETE SET NULL,
+
+    created_by BIGINT
+        REFERENCES public.users(user_id)
+        ON DELETE SET NULL,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT tasks_status_check
+        CHECK (status IN ('TODO', 'IN_PROGRESS', 'COMPLETED')),
+
+    CONSTRAINT tasks_priority_check
+        CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH'))
+);
+
+-- Indexes for foreign key columns
+CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to
+    ON public.tasks(assigned_to);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_created_by
+    ON public.tasks(created_by);
+
+
+================ Task table Raw Data Insert Script =====================
+
+
+INSERT INTO public.tasks
+    (title, description, status, priority, due_date)
+VALUES
+    (
+        'Learn React Router',
+        'Practice dynamic routing and useParams',
+        'TODO',
+        'HIGH',
+        CURRENT_DATE + 3
+    ),
+    (
+        'Build CRUD APIs',
+        'Implement GET, POST, PUT, PATCH and DELETE',
+        'IN_PROGRESS',
+        'HIGH',
+        CURRENT_DATE + 2
+    ),
+    (
+        'Create Bootstrap dashboard',
+        'Display task statistics and recent tasks',
+        'COMPLETED',
+        'MEDIUM',
+        CURRENT_DATE - 1
+    ),
+    (
+        'Write unit tests',
+        'Test API validation and error handling',
+        'TODO',
+        'LOW',
+        CURRENT_DATE + 7
+    );
+
+
+
+========== Users table Raw data insert script ========================
+
+INSERT INTO public.users
+    (firstname, lastname, email, password_hash, "role", is_active)
+VALUES
+    ('Admin', 'One', 'admin1@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', TRUE),
+
+    ('Admin', 'Two', 'admin2@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', TRUE),
+
+    ('Rahul', 'Sharma', 'rahul@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', TRUE),
+
+    ('Priya', 'Patil', 'priya@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', TRUE),
+
+    ('Amit', 'Kulkarni', 'amit@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', TRUE),
+
+    ('Sneha', 'Joshi', 'sneha@example.com',
+     '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', TRUE)
+ON CONFLICT (email) DO NOTHING;
