@@ -4,6 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const employeeRoutes = require("./routes/employeeRoutes");
+const userRoutes = require("./routes/usersRoutes")
+
+
 
 const app = express();
 
@@ -17,6 +20,7 @@ app.use(express.json());
 
 // Employee routes
 app.use("/api/employees", employeeRoutes);
+app.use("/api/users", userRoutes);
 
 // Root route
 app.get("/", (req, res) => {

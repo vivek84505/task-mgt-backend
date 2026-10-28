@@ -8,17 +8,11 @@ const getEmployees = async (req , res) => {
         status : "",
         message : "",
         data:[]
-    }
+     }
    
     
-    try{
-
-        if(req.show_deleted = true) {
-
-        }
-        else{
-            
-        }
+    try{ 
+     
 
         const result = await pool.query(
             `select *
@@ -100,6 +94,9 @@ const getEmployeesById = async(req, res) => {
 
     }
 }
+
+ 
+
 
 
 
